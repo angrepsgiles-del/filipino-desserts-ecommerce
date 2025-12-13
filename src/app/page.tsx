@@ -102,7 +102,7 @@ export default function Home() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden flex flex-col">
+              <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col">
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
