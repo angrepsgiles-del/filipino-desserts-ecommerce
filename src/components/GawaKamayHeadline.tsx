@@ -2,7 +2,7 @@ import React from 'react';
 
 const GawaKamayHeadline = () => {
   return (
-    <div className="text-center my-8">
+    <div className="text-center my-8 liquid-emboss-border">
       <h1 className="text-5xl font-extrabold text-black dark:text-white leading-tight">
         GawaKamay
       </h1>

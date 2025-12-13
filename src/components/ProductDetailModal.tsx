@@ -16,8 +16,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState<number>(1);
+  const { addToCart, setError } = useCart();
+  const [quantity, setQuantity] = useState<number>(0);
 
   if (!isOpen || !product) return null;
 
@@ -27,7 +27,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       setQuantity(1); // Reset quantity after adding to cart
       onClose(); // Close modal after adding
     } else {
-      // Optionally show a message
+      setError("Quantity must be at least 1");
     }
   };
 

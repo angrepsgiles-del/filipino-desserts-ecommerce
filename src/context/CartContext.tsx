@@ -9,10 +9,12 @@ interface CartItem extends Product {
 
 interface CartContextType {
   cart: CartItem[];
+  error: string | null;
   addToCart: (product: Product, quantity: number) => void;
   removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  updateQuantity: (productId:string, quantity: number) => void;
   clearCart: () => void;
+  setError: (message: string) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
@@ -21,6 +23,18 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const clearError = () => {
+    setError(null);
+  };
+
+  const setAndClearError = (message: string) => {
+    setError(message);
+    setTimeout(() => {
+      setError(null);
+    }, 3000);
+  }
 
   const addToCart = (product: Product, quantity: number) => {
     setCart((prevCart) => {
@@ -61,21 +75,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        getTotalItems,
-        getTotalPrice,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+    return (
+        <CartContext.Provider
+            value={{
+                cart,
+                error,
+                addToCart,
+                removeFromCart,
+                updateQuantity,
+                clearCart,
+                setError: setAndClearError,
+                getTotalItems,
+                getTotalPrice,
+            }}
+        >
+            {children}
+        </CartContext.Provider>
+    );
 };
 
 export const useCart = () => {

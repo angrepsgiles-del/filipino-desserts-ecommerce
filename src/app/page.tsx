@@ -1,20 +1,18 @@
 "use client"; // This component needs client-side interactivity
 import { useState } from "react";
 import { products, Product } from "../lib/products";
-import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { useCart } from "../context/CartContext"; // Import useCart
-import CartModal from "../components/CartModal"; // Import CartModal
 import GawaKamayHeadline from "../components/GawaKamayHeadline"; // Import GawaKamayHeadline
 import PreorderInfo from "../components/PreorderInfo"; // Import PreorderInfo
 import ProductDetailModal from "../components/ProductDetailModal"; // Import ProductDetailModal
+import styles from './panghimagas.module.css';
 
 export default function Home() {
-  const { addToCart, getTotalItems } = useCart(); // Use the cart context
+  const { addToCart } = useCart(); // Use the cart context
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     products.reduce((acc, product) => ({ ...acc, [product.id]: 0 }), {})
   );
   const [message, setMessage] = useState<string | null>(null);
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false); // State for cart modal
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); // State for selected product
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false); // State for product detail modal
 
@@ -44,25 +42,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-yellow-200 via-purple-300 to-green-200 dark:from-yellow-700 dark:via-purple-800 dark:to-green-700 font-sans p-4">
-      <header className="w-full max-w-4xl flex justify-between items-center py-4 px-2">
-        <h1 className="text-2xl font-bold text-black dark:text-white">Filipino Desserts</h1>
-        <div className="flex items-center space-x-4">
-          <button onClick={() => setIsCartOpen(true)} className="relative p-2 rounded-full hover:bg-white/20 dark:hover:bg-zinc-700/50">
-            <img src="/images/Cart.png" alt="Cart" className="w-6 h-6 dark:invert" />
-            {getTotalItems() > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {getTotalItems()}
-              </span>
-            )}
-          </button>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-        </div>
-      </header>
+
       <GawaKamayHeadline /> {/* Integrated GawaKamayHeadline */}
       <main className="w-full max-w-4xl py-8">
         <h1 className="text-4xl font-bold text-center mb-8">Our Panghimagas - Desserts </h1>
@@ -73,6 +53,7 @@ export default function Home() {
           </div>
         )}
 
+        <div className={styles.liquidBorder}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
               <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col cursor-pointer" onClick={() => handleProductClick(product)}>
@@ -114,9 +95,9 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
         <PreorderInfo /> {/* Integrated PreorderInfo */}
       </main>
-      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <ProductDetailModal
         product={selectedProduct}
         isOpen={isDetailModalOpen}
