@@ -1,5 +1,4 @@
 "use client"; // This component needs client-side interactivity
-"use client"; // This component needs client-side interactivity
 import { useState } from "react";
 import { products, Product } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
@@ -75,7 +74,7 @@ export default function Home() {
                 <div className="p-4 flex-grow flex flex-col">
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
                   <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.description}</p>
-                  <div className="flex items-center justify-between mt-auto pt-2">
+                  <div className="flex flex-col sm:flex-row items-center justify-between mt-auto pt-2 gap-2 sm:gap-0">
                     <p className="text-lg font-bold">£{product.price.toFixed(2)}</p>
                     <div className="flex items-center space-x-2">
                       <button
@@ -98,7 +97,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={() => handleAddToCart(product, quantities[product.id])}
-                      className="ml-2 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                      className="sm:ml-2 py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-md hover:from-blue-600 hover:to-cyan-600 whitespace-nowrap"
                     >
                       Add to Cart
                     </button>
