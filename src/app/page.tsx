@@ -3,8 +3,10 @@ import Image from "next/image";
 import { useState, FormEvent } from "react";
 import { products } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { useCart } from "../context/CartContext"; // Import useCart
 
 export default function Home() {
+  const { addToCart } = useCart(); // Use the cart context
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     products.reduce((acc, product) => ({ ...acc, [product.id]: 0 }), {})
   );
@@ -18,6 +20,17 @@ export default function Home() {
       ...prev,
       [productId]: isNaN(quantity) ? 0 : quantity,
     }));
+  };
+
+  const handleAddToCart = (product: Product, quantity: number) => {
+    if (quantity > 0) {
+      addToCart(product, quantity);
+      setMessage(`${quantity}x ${product.name} added to cart!`);
+      // Reset quantity after adding to cart
+      setQuantities((prev) => ({ ...prev, [product.id]: 0 }));
+    } else {
+      setMessage("Please select a quantity greater than 0.");
+    }
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -122,6 +135,13 @@ export default function Home() {
                       onChange={(e) => handleQuantityChange(product.id, e.target.value)}
                       className="w-20 p-2 border border-zinc-300 rounded-md text-center bg-zinc-100 dark:bg-zinc-700 dark:border-zinc-600"
                     />
+                    <button
+                      type="button"
+                      onClick={() => handleAddToCart(product, quantities[product.id])}
+                      className="ml-2 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    >
+                      Add to Cart
+                    </button>
                   </div>
                 </div>
               </div>
