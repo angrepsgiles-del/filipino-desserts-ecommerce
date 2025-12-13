@@ -1,5 +1,6 @@
+"use client"; // This component needs client-side interactivity
 import { useState, FormEvent } from "react";
-import { products } from "../lib/products";
+import { products, Product } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { useCart } from "../context/CartContext"; // Import useCart
 import CartModal from "../components/CartModal"; // Import CartModal
@@ -124,13 +125,9 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
               <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover"
-                />
+                <div className="w-full h-48 flex items-center justify-center bg-gray-200 text-gray-700 text-center font-bold">
+                  {product.name}
+                </div>
                 <div className="p-4 flex-grow flex flex-col">
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
                   <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.description}</p>

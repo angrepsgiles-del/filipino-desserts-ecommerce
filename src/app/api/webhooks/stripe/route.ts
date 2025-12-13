@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { kv } from "@/lib/kv"; // Assuming kv is for orders
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-11-17.clover",
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

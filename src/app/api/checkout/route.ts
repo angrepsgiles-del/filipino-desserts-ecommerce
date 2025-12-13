@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { kv } from "@/lib/kv"; // Import KV for order persistence
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2023-10-16", // Use a recent API version
+  apiVersion: "2025-11-17.clover", // Use a recent API version
 });
 
 export async function POST(req: NextRequest) {
