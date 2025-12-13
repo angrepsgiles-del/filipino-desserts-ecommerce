@@ -1,17 +1,18 @@
 "use client"; // This component needs client-side interactivity
-import { useState, FormEvent } from "react";
+"use client"; // This component needs client-side interactivity
+import { useState } from "react";
 import { products, Product } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { useCart } from "../context/CartContext"; // Import useCart
 import CartModal from "../components/CartModal"; // Import CartModal
+import GawaKamayHeadline from "../components/GawaKamayHeadline"; // Import GawaKamayHeadline
+import PreorderInfo from "../components/PreorderInfo"; // Import PreorderInfo
 
 export default function Home() {
   const { addToCart, getTotalItems } = useCart(); // Use the cart context
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     products.reduce((acc, product) => ({ ...acc, [product.id]: 0 }), {})
   );
-  const [guestName, setGuestName] = useState<string>("");
-  const [contactInfo, setContactInfo] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false); // State for cart modal
 
@@ -28,66 +29,9 @@ export default function Home() {
       addToCart(product, quantity);
       setMessage(`${quantity}x ${product.name} added to cart!`);
       // Reset quantity after adding to cart
-      setQuantities((prev) => ({ ...prev, [product.id]: 0 }));
+      setQuantities((prev) => ({ ...acc, [product.id]: 0 }));
     } else {
       setMessage("Please select a quantity greater than 0.");
-    }
-  };
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    setMessage(null);
-
-    const orderedItems = Object.entries(quantities)
-      .filter(([, quantity]) => quantity > 0)
-      .map(([productId, quantity]) => {
-        const product = products.find((p) => p.id === productId);
-        return product ? { ...product, quantity } : null;
-      })
-      .filter(Boolean);
-
-    if (orderedItems.length === 0) {
-      setMessage("Please select at least one item to order.");
-      return;
-    }
-
-    if (!guestName.trim() || !contactInfo.trim()) {
-      setMessage("Please provide your name and contact information.");
-      return;
-    }
-
-    const order = {
-      guestName,
-      contactInfo,
-      items: orderedItems,
-      total: orderedItems.reduce((sum, item) => sum + (item?.price || 0) * (item?.quantity || 0), 0),
-      status: "unpaid",
-      createdAt: new Date().toISOString(),
-    };
-
-    try {
-      const response = await fetch("/api/order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      });
-
-      if (response.ok) {
-        setMessage("Order placed successfully! We will contact you soon.");
-        setQuantities(
-          products.reduce((acc, product) => ({ ...acc, [product.id]: 0 }), {})
-        );
-        setGuestName("");
-        setContactInfo("");
-      } else {
-        const errorData = await response.json();
-        setMessage(`Failed to place order: ${errorData.error || response.statusText}`);
-      }
-    } catch (error) {
-      console.error("Error placing order:", error);
-      setMessage("An unexpected error occurred. Please try again later.");
     }
   };
 
@@ -112,6 +56,7 @@ export default function Home() {
           </SignedOut>
         </div>
       </header>
+      <GawaKamayHeadline /> {/* Integrated GawaKamayHeadline */}
       <main className="w-full max-w-4xl py-8">
         <h1 className="text-4xl font-bold text-center mb-8">Our Delicious Filipino Desserts</h1>
 
@@ -121,7 +66,6 @@ export default function Home() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
               <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col">
@@ -163,45 +107,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-
-          <div className="mt-8 p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4">Your Information</h2>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="guestName" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  id="guestName"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-zinc-300 rounded-md shadow-sm bg-zinc-100 dark:bg-zinc-700 dark:border-zinc-600"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="contactInfo" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Contact Information (Email or Phone)
-                </label>
-                <input
-                  type="text"
-                  id="contactInfo"
-                  value={contactInfo}
-                  onChange={(e) => setContactInfo(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-zinc-300 rounded-md shadow-sm bg-zinc-100 dark:bg-zinc-700 dark:border-zinc-600"
-                  required
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="mt-6 w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Place Order
-            </button>
-          </div>
-        </form>
+        <PreorderInfo /> {/* Integrated PreorderInfo */}
       </main>
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
