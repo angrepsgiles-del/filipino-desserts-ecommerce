@@ -7,7 +7,7 @@ const GawaKamayHeadline = () => {
         GawaKamay
       </h1>
       <p className="text-xl text-zinc-700 dark:text-zinc-300 mt-2">
-        home-baked filipino desserts. slow. soft. dangerous.
+        Home-Baked Filipino Desserts. Slow. Soft. Dangerous.
       </p>
     </div>
   );
