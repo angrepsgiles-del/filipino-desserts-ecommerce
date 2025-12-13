@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, FormEvent } from "react";
 import { products } from "../lib/products";
+import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 export default function Home() {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
@@ -77,7 +78,18 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black p-4">
+    <div className="flex min-h-screen flex-col items-center bg-zinc-50 font-sans dark:bg-black p-4">
+      <header className="w-full max-w-4xl flex justify-between items-center py-4 px-2">
+        <h1 className="text-2xl font-bold text-black dark:text-white">Filipino Desserts</h1>
+        <div>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+        </div>
+      </header>
       <main className="w-full max-w-4xl py-8">
         <h1 className="text-4xl font-bold text-center mb-8">Our Delicious Filipino Desserts</h1>
 
