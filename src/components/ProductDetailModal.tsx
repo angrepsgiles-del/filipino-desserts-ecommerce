@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -15,11 +16,24 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState<number>(1);
+
   if (!isOpen || !product) return null;
+
+  const handleAddToCart = () => {
+    if (quantity > 0) {
+      addToCart(product, quantity);
+      setQuantity(1); // Reset quantity after adding to cart
+      onClose(); // Close modal after adding
+    } else {
+      // Optionally show a message
+    }
+  };
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex justify-center items-center backdrop-blur-md"
       onClick={onClose}
     >
       <div
@@ -54,7 +68,31 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 {product.description}
               </p>
             </div>
-            {/* Add to cart functionality might be added here too */}
+            <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center space-x-2">
+                    <button
+                        type="button"
+                        onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
+                    >
+                        -
+                    </button>
+                    <span className="w-8 text-center">{quantity}</span>
+                    <button
+                        type="button"
+                        onClick={() => setQuantity(prev => prev + 1)}
+                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
+                    >
+                        +
+                    </button>
+                </div>
+                <button
+                    onClick={handleAddToCart}
+                    className="py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-md hover:from-blue-600 hover:to-cyan-600 whitespace-nowrap"
+                >
+                    Add to Cart
+                </button>
+            </div>
           </div>
         </div>
       </div>
