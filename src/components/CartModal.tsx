@@ -1,8 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
+import { loadStripe } from "@stripe/stripe-js";
+
+// Make sure to call loadStripe outside of a component’s render to avoid
+// recreating the Stripe object on every render.
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 
 interface CartModalProps {
   isOpen: boolean;
@@ -10,9 +17,38 @@ interface CartModalProps {
 }
 
 const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
-  const { cart, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
+  const { cart, removeFromCart, updateQuantity, getTotalPrice, getTotalItems, clearCart } = useCart();
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: cart }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create Stripe Checkout Session");
+      }
+
+      const { sessionUrl } = await response.json();
+
+      // Redirect to Stripe Checkout
+      window.location.href = sessionUrl;
+      clearCart(); // Clear cart after redirecting to checkout
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      alert("Failed to proceed to checkout. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -60,8 +96,12 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
               <span>Total:</span>
               <span>${getTotalPrice().toFixed(2)}</span>
             </div>
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md mt-4">
-              Proceed to Checkout
+            <button
+              onClick={handleCheckout}
+              disabled={loading || cart.length === 0}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Processing..." : "Proceed to Checkout"}
             </button>
           </div>
         )}
@@ -71,3 +111,4 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default CartModal;
+
