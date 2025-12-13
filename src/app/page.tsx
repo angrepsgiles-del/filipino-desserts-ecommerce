@@ -78,7 +78,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-100 to-gray-300 dark:from-zinc-900 dark:to-zinc-700 font-sans p-4">
+    <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-yellow-200 via-purple-300 to-green-200 dark:from-yellow-700 dark:via-purple-800 dark:to-green-700 font-sans p-4">
       <header className="w-full max-w-4xl flex justify-between items-center py-4 px-2">
         <h1 className="text-2xl font-bold text-black dark:text-white">Filipino Desserts</h1>
         <div>
