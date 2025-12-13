@@ -1,3 +1,4 @@
+"use client"; // This component needs client-side interactivity
 import { useState } from "react";
 import { products, Product } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
@@ -64,7 +65,7 @@ export default function Home() {
       </header>
       <GawaKamayHeadline /> {/* Integrated GawaKamayHeadline */}
       <main className="w-full max-w-4xl py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Our Delicious Filipino Desserts</h1>
+        <h1 className="text-4xl font-bold text-center mb-8">Our Panghimagas - Desserts </h1>
 
         {message && (
           <div className={`p-4 mb-4 text-center rounded-md ${message.includes("successfully") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
