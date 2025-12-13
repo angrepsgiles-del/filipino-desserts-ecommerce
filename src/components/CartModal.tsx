@@ -73,7 +73,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
                 <Image src={item.imageUrl} alt={item.name} width={60} height={60} className="rounded object-cover" />
                 <div className="flex-grow">
                   <h3 className="text-lg font-semibold text-black dark:text-white">{item.name}</h3>
-                  <p className="text-zinc-600 dark:text-zinc-400">${item.price.toFixed(2)} x {item.quantity}</p>
+                  <p className="text-zinc-600 dark:text-zinc-400">£{item.price.toFixed(2)} x {item.quantity}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <input
@@ -94,7 +94,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
             ))}
             <div className="pt-4 border-t border-zinc-200 dark:border-zinc-700 flex justify-between items-center text-xl font-bold text-black dark:text-white">
               <span>Total:</span>
-              <span>${getTotalPrice().toFixed(2)}</span>
+              <span>£{getTotalPrice().toFixed(2)}</span>
             </div>
             <button
               onClick={handleCheckout}

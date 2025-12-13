@@ -132,14 +132,25 @@ export default function Home() {
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
                   <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.description}</p>
                   <div className="flex items-center justify-between mt-auto pt-2">
-                    <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
-                    <input
-                      type="number"
-                      min="0"
-                      value={quantities[product.id]}
-                      onChange={(e) => handleQuantityChange(product.id, e.target.value)}
-                      className="w-20 p-2 border border-zinc-300 rounded-md text-center bg-zinc-100 dark:bg-zinc-700 dark:border-zinc-600"
-                    />
+                    <p className="text-lg font-bold">£{product.price.toFixed(2)}</p>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => handleQuantityChange(product.id, (quantities[product.id] - 1).toString())}
+                        disabled={quantities[product.id] <= 0}
+                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        -
+                      </button>
+                      <span className="w-8 text-center">{quantities[product.id]}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleQuantityChange(product.id, (quantities[product.id] + 1).toString())}
+                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
+                      >
+                        +
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => handleAddToCart(product, quantities[product.id])}

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     // Convert cart items to Stripe line_items format
     const line_items = items.map((item: any) => ({
       price_data: {
-        currency: "usd",
+        currency: "gbp",
         product_data: {
           name: item.name,
           images: [item.imageUrl], // Use product image
