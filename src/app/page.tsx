@@ -29,7 +29,7 @@ export default function Home() {
       addToCart(product, quantity);
       setMessage(`${quantity}x ${product.name} added to cart!`);
       // Reset quantity after adding to cart
-      setQuantities((prev) => ({ ...acc, [product.id]: 0 }));
+      setQuantities((prev) => ({ ...prev, [product.id]: 0 }));
     } else {
       setMessage("Please select a quantity greater than 0.");
     }
