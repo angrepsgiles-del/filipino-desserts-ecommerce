@@ -1,4 +1,3 @@
-"use client"; // This component needs client-side interactivity
 import { useState } from "react";
 import { products, Product } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
@@ -6,6 +5,7 @@ import { useCart } from "../context/CartContext"; // Import useCart
 import CartModal from "../components/CartModal"; // Import CartModal
 import GawaKamayHeadline from "../components/GawaKamayHeadline"; // Import GawaKamayHeadline
 import PreorderInfo from "../components/PreorderInfo"; // Import PreorderInfo
+import ProductDetailModal from "../components/ProductDetailModal"; // Import ProductDetailModal
 
 export default function Home() {
   const { addToCart, getTotalItems } = useCart(); // Use the cart context
@@ -14,6 +14,8 @@ export default function Home() {
   );
   const [message, setMessage] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false); // State for cart modal
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); // State for selected product
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false); // State for product detail modal
 
   const handleQuantityChange = (productId: string, value: string) => {
     const quantity = parseInt(value, 10);
@@ -32,6 +34,11 @@ export default function Home() {
     } else {
       setMessage("Please select a quantity greater than 0.");
     }
+  };
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDetailModalOpen(true);
   };
 
   return (
@@ -67,7 +74,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col">
+              <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col cursor-pointer" onClick={() => handleProductClick(product)}>
                 <div className="w-full h-48 flex items-center justify-center bg-gray-200 text-gray-700 text-center font-bold">
                   {product.name}
                 </div>
@@ -79,7 +86,7 @@ export default function Home() {
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"
-                        onClick={() => handleQuantityChange(product.id, (quantities[product.id] - 1).toString())}
+                        onClick={(e) => { e.stopPropagation(); handleQuantityChange(product.id, (quantities[product.id] - 1).toString()); }}
                         disabled={quantities[product.id] <= 0}
                         className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -88,7 +95,7 @@ export default function Home() {
                       <span className="w-8 text-center">{quantities[product.id]}</span>
                       <button
                         type="button"
-                        onClick={() => handleQuantityChange(product.id, (quantities[product.id] + 1).toString())}
+                        onClick={(e) => { e.stopPropagation(); handleQuantityChange(product.id, (quantities[product.id] + 1).toString()); }}
                         className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
                       >
                         +
@@ -96,7 +103,7 @@ export default function Home() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleAddToCart(product, quantities[product.id])}
+                      onClick={(e) => { e.stopPropagation(); handleAddToCart(product, quantities[product.id]); }}
                       className="py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-md hover:from-blue-600 hover:to-cyan-600 whitespace-nowrap"
                     >
                       Add to Cart
@@ -109,6 +116,11 @@ export default function Home() {
         <PreorderInfo /> {/* Integrated PreorderInfo */}
       </main>
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+      />
     </div>
   );
 }
