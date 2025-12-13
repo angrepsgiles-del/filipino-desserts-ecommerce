@@ -73,7 +73,7 @@ export default function Home() {
                 </div>
                 <div className="p-4 flex-grow flex flex-col">
                   <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.description}</p>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.shortDescription}</p>
                   <div className="flex items-center justify-between mt-auto pt-2 gap-2 flex-wrap">
                     <p className="text-lg font-bold">£{product.price.toFixed(2)}</p>
                     <div className="flex items-center space-x-2">
