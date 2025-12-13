@@ -8,7 +8,7 @@ const PreorderInfo = () => {
                     bg-gradient-to-br from-purple-200 via-pink-200 to-red-200
                     dark:from-purple-800 dark:via-pink-800 dark:to-red-800
                     text-black dark:text-white">
-      <p className="text-lg mb-4">
+      <p className="text-lg mb-4 uppercase">
         baked in small batches, inspired by filipino classics, and made to be eaten fresh — not warehoused, not rushed.
       </p>
       <h3 className="text-xl font-bold mb-2">Why preorder?</h3>
