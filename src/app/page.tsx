@@ -1,18 +1,18 @@
-"use client"; // This component needs client-side interactivity
-import Image from "next/image";
 import { useState, FormEvent } from "react";
 import { products } from "../lib/products";
 import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { useCart } from "../context/CartContext"; // Import useCart
+import CartModal from "../components/CartModal"; // Import CartModal
 
 export default function Home() {
-  const { addToCart } = useCart(); // Use the cart context
+  const { addToCart, getTotalItems } = useCart(); // Use the cart context
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     products.reduce((acc, product) => ({ ...acc, [product.id]: 0 }), {})
   );
   const [guestName, setGuestName] = useState<string>("");
   const [contactInfo, setContactInfo] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false); // State for cart modal
 
   const handleQuantityChange = (productId: string, value: string) => {
     const quantity = parseInt(value, 10);
@@ -94,7 +94,15 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-yellow-200 via-purple-300 to-green-200 dark:from-yellow-700 dark:via-purple-800 dark:to-green-700 font-sans p-4">
       <header className="w-full max-w-4xl flex justify-between items-center py-4 px-2">
         <h1 className="text-2xl font-bold text-black dark:text-white">Filipino Desserts</h1>
-        <div>
+        <div className="flex items-center space-x-4">
+          <button onClick={() => setIsCartOpen(true)} className="relative p-2 rounded-full hover:bg-white/20 dark:hover:bg-zinc-700/50">
+            <span role="img" aria-label="cart" className="text-2xl">🛒</span>
+            {getTotalItems() > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {getTotalItems()}
+              </span>
+            )}
+          </button>
           <SignedIn>
             <UserButton afterSignOutUrl="/" />
           </SignedIn>
@@ -187,6 +195,7 @@ export default function Home() {
           </div>
         </form>
       </main>
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 }
