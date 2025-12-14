@@ -58,13 +58,13 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
           <div className="md:w-1/2 flex flex-col justify-between">
             <div>
-              <h2 className="text-3xl font-bold mb-2 text-black dark:text-white">
+              <h2 className="text-3xl font-bold mb-2 text-zinc-800 dark:text-white">
                 {product.name}
               </h2>
-              <p className="text-xl font-semibold mb-4 text-black dark:text-white">
+              <p className="text-xl font-semibold mb-4 text-zinc-800 dark:text-white">
                 £{product.price.toFixed(2)}
               </p>
-              <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+              <p className="text-zinc-800 dark:text-zinc-400 mb-4">
                 {product.description}
               </p>
             </div>
@@ -73,22 +73,22 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <button
                         type="button"
                         onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
-                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
+                        className="p-1 px-3 bg-yellow-400 dark:bg-yellow-700 rounded-md hover:bg-yellow-500 dark:hover:bg-yellow-600 animate-pulse-red"
                     >
                         -
                     </button>
-                    <span className="w-8 text-center">{quantity}</span>
+                    <span className="w-8 text-center text-black">{quantity}</span>
                     <button
                         type="button"
                         onClick={() => setQuantity(prev => prev + 1)}
-                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
+                        className="p-1 px-3 bg-yellow-400 dark:bg-yellow-700 rounded-md hover:bg-yellow-500 dark:hover:bg-yellow-600 animate-pulse-red"
                     >
                         +
                     </button>
                 </div>
                 <button
                     onClick={handleAddToCart}
-                    className="py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-md hover:from-blue-600 hover:to-cyan-600 whitespace-nowrap"
+                    className="py-2 px-4 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-md hover:from-yellow-500 hover:to-yellow-700 animate-pulse-red whitespace-nowrap"
                 >
                     Add to Cart
                 </button>

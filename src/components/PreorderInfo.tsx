@@ -2,12 +2,9 @@ import React from 'react';
 
 const PreorderInfo = () => {
   return (
-    <div className="w-full max-w-4xl p-6 my-8 rounded-lg shadow-lg
-                    bg-white/30 dark:bg-zinc-800/30 backdrop-blur-md
-                    border border-white/20 dark:border-zinc-700/50
-                    bg-gradient-to-br from-purple-200 via-pink-200 to-red-200
-                    dark:from-purple-800 dark:via-pink-800 dark:to-red-800
-                    text-black dark:text-white">
+<div
+      className="w-full max-w-4xl p-6 my-8 rounded-lg shadow-lg bg-white/30 dark:bg-zinc-800/30 backdrop-blur-md border border-white/20 dark:border-zinc-700/50 bg-gradient-to-br from-sky-200 via-blue-200 to-indigo-200 dark:from-sky-700 dark:via-blue-800 dark:to-indigo-900"
+>
       <p className="text-lg mb-4 uppercase">
         baked in small batches, inspired by filipino classics, and made to be eaten fresh — not warehoused, not rushed.
       </p>

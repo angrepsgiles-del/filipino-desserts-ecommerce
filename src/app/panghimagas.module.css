@@ -1,9 +1,105 @@
-.liquidBorder {
-    border: 3px solid #8644c5;
-    border-radius: 2rem 5rem 3rem 6rem / 5rem 3rem 6rem 2rem;
-    padding: 1.5rem;
-    position: relative;
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+.liquidFrame {
+  position: relative;
+  border-radius: 12px;
+  padding: 2px;
+  background: transparent;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.liquidFrame::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    #f79533,
+    #f37055,
+    #ef4e7b,
+    #a166ab,
+    #5073b8,
+    #1098ad,
+    #07b39b,
+    #6fba82
+  );
+  background-size: 50% 50%;
+  animation: liquidFrameAnimation 15s ease infinite;
+  z-index: -1;
+}
+
+.liquidFrame::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  background: var(--background-color, #fff); /* Assuming a CSS variable for background */
+  border-radius: 10px;
+  z-index: -1;
+}
+
+@keyframes liquidFrameAnimation {
+  0% {
+    transform: rotate(0deg);
   }
-  
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.liquidCard {
+  position: relative;
+  border-radius: 12px;
+  padding: 2px;
+  background: transparent;
+  overflow: hidden;
+  transform: translateZ(0); /* For better rendering performance */
+}
+
+.liquidCard::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    #f79533,
+    #f37055,
+    #ef4e7b,
+    #a166ab,
+    #5073b8,
+    #1098ad,
+    #07b39b,
+    #6fba82
+  );
+  background-size: 50% 50%;
+  animation: liquidCardAnimation 10s linear infinite;
+  z-index: -1;
+}
+
+.liquidCard::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: var(--background-color, #fff); /* Assuming a CSS variable for background */
+  border-radius: 10px;
+  z-index: -1;
+}
+
+@keyframes liquidCardAnimation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

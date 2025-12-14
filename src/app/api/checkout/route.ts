@@ -1,13 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { kv } from "@/lib/kv"; // Import KV for order persistence
+import { createClient } from "@vercel/kv"; // Import createClient for KV
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2025-11-17.clover", // Use a recent API version
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error("STRIPE_SECRET_KEY is not set.");
+  }
+  return new Stripe(key, { apiVersion: "2025-11-17.clover" });
+}
+
+function getKv() {
+  const url = process.env.KV_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) {
+    throw new Error("Missing Upstash Redis environment variables (KV_URL, KV_REST_API_TOKEN).");
+  }
+  return createClient({ url, token });
+}
 
 export async function POST(req: NextRequest) {
   try {
+    let stripe: Stripe;
+    try {
+      stripe = getStripe();
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    let kvClient;
+    try {
+      kvClient = getKv();
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
     const { items, guestName, contactInfo } = await req.json();
 
     if (!items || items.length === 0) {
@@ -25,7 +51,7 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
       stripeSessionId: null, // Will be updated after session creation
     };
-    await kv.set(orderId, JSON.stringify(orderDetails));
+    await kvClient.set(orderId, JSON.stringify(orderDetails));
 
 
     // Convert cart items to Stripe line_items format
@@ -54,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     // Update order in KV with Stripe Session ID
     const updatedOrderDetails = { ...orderDetails, stripeSessionId: session.id };
-    await kv.set(orderId, JSON.stringify(updatedOrderDetails));
+    await kvClient.set(orderId, JSON.stringify(updatedOrderDetails));
 
 
     return NextResponse.json({ sessionUrl: session.url }, { status: 200 });

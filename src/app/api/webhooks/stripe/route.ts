@@ -1,14 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { kv } from "@/lib/kv"; // Assuming kv is for orders
+import { createClient } from "@vercel/kv"; // Import createClient for KV
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2025-11-17.clover",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error("STRIPE_SECRET_KEY is not set.");
+  }
+  return new Stripe(key, { apiVersion: "2025-11-17.clover" });
+}
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+function getKv() {
+  const url = process.env.KV_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) {
+    throw new Error("Missing Upstash Redis environment variables (KV_URL, KV_REST_API_TOKEN).");
+  }
+  return createClient({ url, token });
+}
 
 export async function POST(req: NextRequest) {
+  let stripe: Stripe;
+  let kvClient;
+  let webhookSecret: string | undefined;
+  try {
+    stripe = getStripe();
+    kvClient = getKv();
+    webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) throw new Error("STRIPE_WEBHOOK_SECRET is not set.");
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
 
@@ -36,11 +58,11 @@ export async function POST(req: NextRequest) {
       if (orderId) {
         try {
           // Fetch the order from KV
-          const orderString = await kv.get(orderId);
+          const orderString = await kvClient.get(orderId);
           if (orderString) {
             const order = JSON.parse(orderString as string);
             order.status = "paid"; // Mark as paid
-            await kv.set(orderId, JSON.stringify(order));
+            await kvClient.set(orderId, JSON.stringify(order));
             console.log(`Order ${orderId} marked as paid.`);
           } else {
             console.warn(`Order ${orderId} not found in KV.`);

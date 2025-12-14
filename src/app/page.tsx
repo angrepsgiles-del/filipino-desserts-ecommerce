@@ -54,17 +54,18 @@ export default function Home() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={styles.liquidFrame}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="liquid-emboss-border bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col cursor-pointer" onClick={() => handleProductClick(product)}>
+              <div key={product.id} className={`${styles.liquidCard} bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md overflow-hidden flex flex-col cursor-pointer`} onClick={() => handleProductClick(product)}>
                 <div className="w-full h-48 flex items-center justify-center bg-gray-200 text-gray-700 text-center font-bold">
                   {product.name}
                 </div>
                 <div className="p-4 flex-grow flex flex-col">
-                  <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.shortDescription}</p>
+                  <h2 className="text-xl font-extrabold mb-2 text-zinc-900 dark:text-white">{product.name}</h2>
+                  <p className="text-zinc-800 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.shortDescription}</p>
                   <div className="flex items-center justify-between mt-auto pt-2 gap-2 flex-wrap">
-                    <p className="text-lg font-bold">£{product.price.toFixed(2)}</p>
+                    <p className="text-lg text-zinc-900 font-extrabold dark:text-white">£{product.price.toFixed(2)}</p>
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"
@@ -86,7 +87,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); handleAddToCart(product, quantities[product.id]); }}
-                      className="py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-md hover:from-blue-600 hover:to-cyan-600 whitespace-nowrap"
+                      className="py-2 px-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-zinc-900 rounded-md hover:from-yellow-300 hover:to-amber-400 hover:animate-pulse active:ring-4 active:ring-yellow-200/80 active:scale-[0.98] whitespace-nowrap"
                     >
                       Add to Cart
                     </button>
@@ -95,6 +96,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
         <PreorderInfo /> {/* Integrated PreorderInfo */}
       </main>
       <ProductDetailModal
