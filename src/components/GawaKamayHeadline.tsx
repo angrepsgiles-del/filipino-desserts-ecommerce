@@ -16,6 +16,8 @@ export default function GawaKamayHeadline() {
     const el = ref.current;
     if (!el) return;
 
+    let animationFrameId: number;
+
     const tick = (t: number) => {
       const dt = clamp((t - (last.current || t)) / 1000, 0, 0.05);
       last.current = t;
@@ -62,10 +64,14 @@ export default function GawaKamayHeadline() {
       el.style.setProperty("--v", `${v}`);
       el.style.setProperty("--t", `${t * 0.001}`);
 
-      requestAnimationFrame(tick);
+      animationFrameId = requestAnimationFrame(tick);
     };
 
-    requestAnimationFrame(tick);
+    animationFrameId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   const onMove = (x: number, y: number) => {
@@ -91,7 +97,7 @@ export default function GawaKamayHeadline() {
       }}
       onTouchEnd={() => (cursor.current.inside = false)}
     >
-      <svg className={styles.svgDefs} aria-hidden="true">
+      <svg className={styles.svgDefs}>
         <filter id="goo">
           <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
           <feColorMatrix
@@ -115,7 +121,7 @@ export default function GawaKamayHeadline() {
         </filter>
       </svg>
 
-      <div className={styles.slime} aria-hidden="true">
+      <div className={styles.slime}>
         <div className={styles.blobs}>
           <div className={styles.b1} />
           <div className={styles.b2} />

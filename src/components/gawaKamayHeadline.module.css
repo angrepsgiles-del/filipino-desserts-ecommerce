@@ -115,3 +115,41 @@
   position: relative;
   z-index: 1;
 }
+
+.slime {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px; /* Adjust as needed */
+  transform: translate(calc(var(--mx, 0) * 1px), calc(var(--my, 0) * 1px)) scale(var(--v, 1));
+  filter: url(#goo) url(#wobble);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blobs {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  filter: blur(var(--blur-amount, 30px)); /* Blurs blobs to create the goo effect */
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.blob {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4); /* Blob color */
+  border-radius: 50%;
+  width: var(--blob-size, 80px);
+  height: var(--blob-size, 80px);
+  transform: translate(var(--blob-x), var(--blob-y)) scale(var(--blob-scale, 1));
+  animation: blobMovement 10s infinite ease-in-out alternate;
+}
+
+@keyframes blobMovement {
+  0%   { transform: translate(var(--initial-x), var(--initial-y)) scale(var(--initial-scale)); opacity: 0.8; }
+  50%  { transform: translate(var(--mid-x), var(--mid-y)) scale(var(--mid-scale)); opacity: 1; }
+  100% { transform: translate(var(--final-x), var(--final-y)) scale(var(--final-scale)); opacity: 0.8; }
+}
