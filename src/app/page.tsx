@@ -1,5 +1,6 @@
 "use client"; // This component needs client-side interactivity
-import { useState } from "react";
+import { useState, useRef } from "react";
+import Link from "next/link";
 import { products, Product } from "../lib/products";
 import { useCart } from "../context/CartContext"; // Import useCart
 import GawaKamayHeadline from "../components/GawaKamayHeadline"; // Import GawaKamayHeadline
@@ -13,7 +14,8 @@ export default function Home() {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     products.reduce((acc, product) => ({ ...acc, [product.id]: 0 }), {})
   );
-  const [message, setMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); // State for selected product
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false); // State for product detail modal
 
@@ -28,11 +30,22 @@ export default function Home() {
   const handleAddToCart = (product: Product, quantity: number) => {
     if (quantity > 0) {
       addToCart(product, quantity);
-      setMessage(`${quantity}x ${product.name} added to cart!`);
-      // Reset quantity after adding to cart
+      setToast({ type: "success", text: `${quantity}x ${product.name} added. go to cart →` });
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+      toastTimeoutRef.current = setTimeout(() => {
+        setToast(null);
+      }, 3000);
       setQuantities((prev) => ({ ...prev, [product.id]: 0 }));
     } else {
-      setMessage("Please select a quantity greater than 0.");
+      setToast({ type: "error", text: "Please select a quantity greater than 0." });
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+      toastTimeoutRef.current = setTimeout(() => {
+        setToast(null);
+      }, 3000);
     }
   };
 
@@ -48,9 +61,18 @@ export default function Home() {
       <main className="w-full max-w-4xl py-8">
         <h1 className="text-4xl font-bold text-center mb-8">Our Panghimagas - Desserts </h1>
 
-        {message && (
-          <div className={`p-4 mb-4 text-center rounded-md ${message.includes("successfully") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-            {message}
+        {toast && (
+          <div className={`fixed top-5 left-1/2 -translate-x-1/2 p-4 rounded-md shadow-lg text-white z-50 ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}>
+            {toast.text.includes("go to cart") ? (
+              <p>
+                {toast.text.split("go to cart")[0]}
+                <Link href="/cart" className="font-bold underline ml-2">
+                  go to cart →
+                </Link>
+              </p>
+            ) : (
+              toast.text
+            )}
           </div>
         )}
 
@@ -71,15 +93,17 @@ export default function Home() {
                         type="button"
                         onClick={(e) => { e.stopPropagation(); handleQuantityChange(product.id, (quantities[product.id] - 1).toString()); }}
                         disabled={quantities[product.id] <= 0}
-                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:animate-pulse hover:bg-gradient-to-r hover:from-yellow-300 hover:to-red-400 active:ring-4 active:ring-red-200/70 active:scale-[0.98]"
                       >
                         -
                       </button>
-                      <span className="w-8 text-center">{quantities[product.id]}</span>
+                      <span className="w-fit text-center text-zinc-900 dark:text-zinc-100 font-extrabold bg-white/40 dark:bg-black/20 rounded px-2 py-0.5">
+                        {quantities[product.id]}
+                      </span>
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); handleQuantityChange(product.id, (quantities[product.id] + 1).toString()); }}
-                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600"
+                        className="p-1 px-3 bg-gray-200 dark:bg-zinc-700 rounded-md hover:animate-pulse hover:bg-gradient-to-r hover:from-yellow-300 hover:to-red-400 active:ring-4 active:ring-red-200/70 active:scale-[0.98]"
                       >
                         +
                       </button>
@@ -87,7 +111,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); handleAddToCart(product, quantities[product.id]); }}
-                      className="py-2 px-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-zinc-900 rounded-md hover:from-yellow-300 hover:to-amber-400 hover:animate-pulse active:ring-4 active:ring-yellow-200/80 active:scale-[0.98] whitespace-nowrap"
+                      className="py-2 px-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-zinc-900 rounded-md hover:animate-pulse hover:from-yellow-500 hover:to-amber-600 active:ring-4 active:ring-red-200/70 active:scale-[0.98] whitespace-nowrap"
                     >
                       Add to Cart
                     </button>
