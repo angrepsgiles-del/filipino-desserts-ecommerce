@@ -80,14 +80,17 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
               <div key={product.id} className={`${styles.liquidCard} bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md overflow-hidden flex flex-col cursor-pointer`} onClick={() => handleProductClick(product)}>
-                <div className="w-full h-48 flex items-center justify-center bg-gray-200 text-gray-700 text-center font-bold">
-                  {product.name}
-                </div>
+              <img
+  src={product.imageUrl}
+  alt={product.name}
+  className="w-full h-48 object-cover"
+  loading="lazy"
+/>
                 <div className="p-4 flex-grow flex flex-col">
                   <h2 className="text-xl font-extrabold mb-2 text-zinc-900 dark:text-white">{product.name}</h2>
                   <p className="text-zinc-800 dark:text-zinc-400 text-sm mb-3 flex-grow">{product.shortDescription}</p>
                   <div className="flex items-center justify-between mt-auto pt-2 gap-2 flex-wrap">
-                    <p className="text-lg text-zinc-900 font-extrabold dark:text-white">£{product.price.toFixed(2)}</p>
+                    <div onClick={(e) => e.stopPropagation()} className="text-yellow-500 dark:text-yellow-400 font-extrabold text-xl hover:animate-pulse hover:bg-gradient-to-r hover:from-yellow-300 hover:to-red-400 hover:bg-clip-text hover:text-transparent">£{product.price.toFixed(2)}</div>
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"

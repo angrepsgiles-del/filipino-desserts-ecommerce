@@ -1,0 +1,93 @@
+.frame {
+  /* this creates the border without masks */
+  position: relative;
+  border-radius: 28px;
+  padding: 18px;
+  border: 3px solid transparent;
+
+  /* background layers:
+     - layer 1 = inner glass panel
+     - layer 2 = animated liquid border (shows through transparent border)
+  */
+  background:
+    linear-gradient(rgba(255,255,255,0.10), rgba(255,255,255,0.06)) padding-box,
+    linear-gradient(
+      90deg,
+      rgba(110,55,170,0.95),
+      rgba(80,170,255,0.85),
+      rgba(255,180,90,0.75),
+      rgba(110,55,170,0.95)
+    ) border-box;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* horizontal liquid motion */
+  background-size: 100% 100%, 300% 100%;
+  animation: liquidFlow 6s linear infinite;
+
+  /* optional: smoother visuals */
+  transform: translateZ(0);
+}
+
+/* horizontal conveyor-belt animation */
+@keyframes liquidFlow {
+  0%   { background-position: 0 0, 0% 50%; }
+  100% { background-position: 0 0, 200% 50%; }
+}
+
+/* extra “liquid field” sheen that follows cursor, no clipping */
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: -18px; /* outside, so it feels like a field */
+  border-radius: 40px;
+
+  background:
+    radial-gradient(
+      520px 240px at var(--mx, 50%) var(--my, 50%),
+      rgba(110,55,170,0.25),
+      transparent 65%
+    ),
+    radial-gradient(
+      520px 240px at calc(var(--mx, 50%) + 18%) calc(var(--my, 50%) - 10%),
+      rgba(80,170,255,0.18),
+      transparent 70%
+    );
+
+  filter: blur(10px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* subtle moving noise-ish highlight to make it feel wet */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.20),
+      transparent
+    );
+  background-size: 200% 100%;
+  animation: sheen 2.8s ease-in-out infinite;
+
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+@keyframes sheen {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+}
