@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext"; // Import useCart
 import GawaKamayHeadline from "../components/GawaKamayHeadline"; // Import GawaKamayHeadline
 import PreorderInfo from "../components/PreorderInfo"; // Import PreorderInfo
 import ProductDetailModal from "../components/ProductDetailModal"; // Import ProductDetailModal
+
 import styles from './panghimagas.module.css';
 
 export default function Home() {
@@ -53,10 +54,9 @@ export default function Home() {
           </div>
         )}
 
-        <div className={styles.liquidBorder}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col cursor-pointer" onClick={() => handleProductClick(product)}>
+              <div key={product.id} className="liquid-emboss-border bg-white/30 dark:bg-zinc-800/30 rounded-lg shadow-lg backdrop-blur-md border border-white/20 dark:border-zinc-700/50 overflow-hidden flex flex-col cursor-pointer" onClick={() => handleProductClick(product)}>
                 <div className="w-full h-48 flex items-center justify-center bg-gray-200 text-gray-700 text-center font-bold">
                   {product.name}
                 </div>
@@ -95,7 +95,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
         <PreorderInfo /> {/* Integrated PreorderInfo */}
       </main>
       <ProductDetailModal
