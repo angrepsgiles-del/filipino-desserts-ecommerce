@@ -1,8 +1,32 @@
 "use client";
 import { useCart } from "../../context/CartContext";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 const CartPage = () => {
   const { cart, getTotalPrice } = useCart();
+  const router = useRouter(); // Initialize useRouter
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cartItems: cart }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Checkout failed");
+      }
+
+      const { url } = await response.json();
+      router.push(url); // Redirect to the checkout URL provided by the API
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      alert("Checkout failed. Please try again."); // User-friendly error message
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-yellow-200 via-purple-300 to-green-200 dark:from-yellow-700 dark:via-purple-800 dark:to-green-700 font-sans p-4">
@@ -27,10 +51,17 @@ const CartPage = () => {
                 </div>
               ))}
               <hr className="my-4" />
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-4">
                 <p className="text-xl font-bold">Total:</p>
                 <p className="text-xl font-bold">£{getTotalPrice().toFixed(2)}</p>
               </div>
+              <button
+                onClick={handleCheckout}
+                disabled={cart.length === 0}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Proceed to Checkout
+              </button>
             </div>
           )}
         </div>
