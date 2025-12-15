@@ -1,160 +1,77 @@
 .frame {
   position: relative;
-  border-radius: 28px;
-  padding: 18px;
-  border: 3px solid transparent;
-  overflow: hidden; /* Temporarily set to hidden, will be visible for liquid spill */
-
-  /* glass base + animated border (no masks) */
-  background:
-    linear-gradient(rgba(255,255,255,0.10), rgba(255,255,255,0.05)) padding-box,
-    linear-gradient(
-      90deg,
-      rgba(110,55,170,0.95),
-      rgba(79,163,255,0.85),
-      rgba(123,231,196,0.80),
-      rgba(255,184,90,0.75),
-      rgba(110,55,170,0.95)
-    ) border-box;
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transform: translateZ(0);
-
-  /* water conveyor belt */
-  background-size: 100% 100%, 420% 100%;
-  animation: borderFlow 7s linear infinite;
-}
-
-@keyframes borderFlow {
-  0%   { background-position: 0 0, 0% 50%; }
-  100% { background-position: 0 0, 220% 50%; }
-}
-
-/* New silver liquid effect */
-.liquidEffect {
-  position: absolute;
-  /* Allow liquid to spill beyond the frame's rounded corners */
-  inset: -30px;
-  border-radius: 28px; /* Inherit or match parent's border-radius for visual consistency */
-  pointer-events: none;
-  z-index: 0; /* Below the text, above the frame::before if it had an explicit z-index */
-  
-  /* Layered gradients for metallic/glassy look */
-  background:
-    /* Top highlight - acts like a light reflection */
-    radial-gradient(
-      circle at calc(var(--mx, 50%) + 15%) calc(var(--my, 50%) + 10%),
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0) 60%
-    ),
-    /* Main liquid body - silver/greyish tone */
-    radial-gradient(
-      ellipse at var(--mx, 50%) var(--my, 50%),
-      rgba(192, 192, 192, 0.7) 0%, /* Silver base */
-      rgba(128, 128, 128, 0.5) 50%, /* Darker silver/grey */
-      rgba(64, 64, 64, 0.3) 100% /* Almost transparent dark */
-    );
-  
-  background-size: 200% 200%; /* Make gradients larger than the inset area */
-  background-position: var(--mx, 50%) var(--my, 50%);
-  transition: background-position 0.1s linear; /* Smooth gradient movement */
-
-  /* Gooey effect using blur */
-  filter: blur(calc(20px + var(--v, 0) * 10px)); /* Blur increases with velocity for more "goo" */
-  
-  /* See-through glassy effect */
-  backdrop-filter: blur(8px) saturate(150%);
-  -webkit-backdrop-filter: blur(8px) saturate(150%);
-  opacity: calc(0.9 - var(--v, 0) * 0.2); /* Opacity slightly decreases with velocity */
-  transform: scale(calc(1 + var(--v, 0) * 0.05)); /* Slight scale with velocity */
+  padding: 20px;
+  overflow: visible;
 }
 
 .inner {
   position: relative;
-  z-index: 1; /* Ensure text is above the liquid */
+  z-index: 3;
+  border-radius: 26px;
+  background: rgba(255,255,255,0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-/* Keep other existing styles like .frame::before and .frame::after if they are part of the animated border and ripples */
-/* These were already part of the animation, so keeping them. */
-
-/* the "unhinged fluid field" that EVADES cursor.
-   driven by --mx/--my set by the physics loop */
-.frame::before {
-  content: "";
+/* SLIME BORDER (NOT A RECTANGLE) */
+.slime {
   position: absolute;
-  inset: -38%;
-  border-radius: 999px;
+  inset: -40px;
   pointer-events: none;
-
-  /* 3 layered blobs = pseudo-perlin interference */
-  background:
-    radial-gradient(
-      520px 260px at var(--mx, 50%) var(--my, 50%),
-      rgba(110,55,170,0.40),
-      transparent 68%
-    ),
-    radial-gradient(
-      520px 260px at calc(var(--mx, 50%) + 18%) calc(var(--my, 50%) - 12%),
-      rgba(79,163,255,0.30),
-      transparent 72%
-    ),
-    radial-gradient(
-      560px 300px at calc(var(--mx, 50%) - 22%) calc(var(--my, 50%) + 14%),
-      rgba(255,184,90,0.22),
-      transparent 74%
-    );
-
-  /* motion + viscosity */
-  filter: blur(18px);
-  opacity: 0.95;
-
-  /* subtle warp tied to velocity (v ramps glow) */
-  transform:
-    translateZ(0)
-    scale(calc(1 + (var(--v, 0) * 0.002)))
-    rotate(calc(var(--t, 0) * 2deg));
-
-  /* "water wobble" that never stops */
-  animation: fieldWobble 4.2s ease-in-out infinite alternate;
+  z-index: 1;
 }
 
-@keyframes fieldWobble {
-  0%   { transform: translateZ(0) scale(1.02) rotate(0deg); }
-  50%  { transform: translateZ(0) scale(1.05) rotate(1.2deg); }
-  100% { transform: translateZ(0) scale(1.03) rotate(-0.8deg); }
-}
-
-/* surface ripples: animated interference stripes */
-.frame::after {
-  content: "";
+.blobs {
   position: absolute;
   inset: 0;
-  border-radius: 28px;
-  pointer-events: none;
-
-  background:
-    radial-gradient(closest-side at 30% 40%, rgba(255,255,255,0.22), transparent 60%),
-    radial-gradient(closest-side at 70% 60%, rgba(255,255,255,0.18), transparent 62%),
-    linear-gradient(
-      120deg,
-      rgba(255,255,255,0.00),
-      rgba(255,255,255,0.18),
-      rgba(255,255,255,0.00)
-    );
-
-  background-size: 100% 100%, 100% 100%, 240% 100%;
-  background-position: 0 0, 0 0, 0% 50%;
-
-  mix-blend-mode: overlay;
-  opacity: 0.40;
-  filter: blur(0.6px);
-
-  animation: rippleSweep 2.9s ease-in-out infinite;
 }
 
-@keyframes rippleSweep {
-  0%   { background-position: 0 0, 0 0, 0% 50%; }
-  50%  { background-position: 0 0, 0 0, 120% 50%; }
-  100% { background-position: 0 0, 0 0, 0% 50%; }
+.blobs > div {
+  position: absolute;
+  border-radius: 999px;
+  mix-blend-mode: screen;
+  filter: blur(22px);
+  transform: scale(calc(1 + var(--v, 0) * 0.4));
+}
+
+/* main spill */
+.b1 {
+  width: 260px;
+  height: 200px;
+  left: calc(var(--mx, 50%) - 130px);
+  top: calc(var(--my, 50%) - 100px);
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(220,220,220,0.9),
+    rgba(180,180,180,0.45),
+    transparent 70%
+  );
+}
+
+/* trailing smear */
+.b2 {
+  width: 360px;
+  height: 220px;
+  left: calc(var(--mx, 50%) - 220px);
+  top: calc(var(--my, 50%) - 40px);
+  background: radial-gradient(
+    circle at 60% 40%,
+    rgba(200,200,200,0.5),
+    transparent 72%
+  );
+  opacity: 0.7;
+}
+
+/* ambient halo */
+.b3 {
+  width: 520px;
+  height: 300px;
+  left: calc(50% - 260px);
+  top: calc(50% - 150px);
+  background: radial-gradient(
+    closest-side,
+    rgba(255,255,255,0.25),
+    transparent 65%
+  );
+  opacity: 0.4;
 }

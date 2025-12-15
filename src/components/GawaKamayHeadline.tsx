@@ -3,85 +3,64 @@
 import { useEffect, useRef } from "react";
 import styles from "./gawaKamayHeadline.module.css";
 
-const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+const clamp = (v: number, a: number, b: number) =>
+  Math.max(a, Math.min(b, v));
 
 export default function GawaKamayHeadline() {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const cursor = useRef({ x: 0.5, y: 0.5, inside: false });
-  const liquidTarget = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 }); // Represents the center of the liquid effect
+  const blob = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
   const last = useRef<number>(0);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    let animationFrameId: number;
+    let raf: number;
 
     const tick = (t: number) => {
       const dt = clamp((t - (last.current || t)) / 1000, 0, 0.05);
       last.current = t;
 
       const c = cursor.current;
-      const lt = liquidTarget.current;
+      const b = blob.current;
 
-      // Target point for the liquid, defaults to center
+      // repel target
       let tx = 0.5;
       let ty = 0.5;
 
       if (c.inside) {
-        // Calculate vector from cursor to liquid target
-        const dx = lt.x - c.x;
-        const dy = lt.y - c.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const dx = b.x - c.x;
+        const dy = b.y - c.y;
+        const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 0.0001);
+        const repel = 0.55;
 
-        // Repel the liquid target from the cursor
-        // The further the cursor, the stronger the repulsion, up to a limit
-        const repelStrength = 0.8; // How strongly it repels
-        const minRepelDist = 0.1; // Distance below which repulsion becomes very strong
-        const effectiveDist = Math.max(dist, minRepelDist);
-
-        tx = clamp(lt.x + (dx / effectiveDist) * repelStrength, 0.05, 0.95);
-        ty = clamp(lt.y + (dy / effectiveDist) * repelStrength, 0.05, 0.95);
-
-      } else {
-        // Relax to center when cursor leaves
-        tx = 0.5;
-        ty = 0.5;
+        tx = clamp(b.x + (dx / dist) * repel, -0.2, 1.2);
+        ty = clamp(b.y + (dy / dist) * repel, -0.2, 1.2);
       }
 
-      // Spring physics for viscous movement
-      const springK = 8.0; // Spring constant
-      const dampingFactor = 0.7; // Damping to simulate viscosity
+      // viscous spring
+      const k = 7.5;
+      const damp = 0.85;
 
-      const ax = (tx - lt.x) * springK;
-      const ay = (ty - lt.y) * springK;
+      b.vx = (b.vx + (tx - b.x) * k * dt) * damp;
+      b.vy = (b.vy + (ty - b.y) * k * dt) * damp;
 
-      lt.vx = (lt.vx + ax * dt) * dampingFactor;
-      lt.vy = (lt.vy + ay * dt) * dampingFactor;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
 
-      lt.x += lt.vx * dt;
-      lt.y += lt.vy * dt;
+      const v = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
 
-      // Clamp liquid position to prevent it from going too far out
-      lt.x = clamp(lt.x, -0.2, 1.2); // Allow some spill, but not excessive
-      lt.y = clamp(lt.y, -0.2, 1.2);
+      el.style.setProperty("--mx", `${b.x * 100}%`);
+      el.style.setProperty("--my", `${b.y * 100}%`);
+      el.style.setProperty("--v", `${clamp(v * 0.6, 0, 1)}`);
 
-      const v = Math.sqrt(lt.vx * lt.vx + lt.vy * lt.vy); // Velocity magnitude
-
-      // Set CSS variables (0-100% for mx/my, 0-1 for v)
-      el.style.setProperty("--mx", `${lt.x * 100}%`);
-      el.style.setProperty("--my", `${lt.y * 100}%`);
-      el.style.setProperty("--v", `${clamp(v * 0.5, 0, 1)}`); // Scale velocity for --v range
-
-      animationFrameId = requestAnimationFrame(tick);
+      raf = requestAnimationFrame(tick);
     };
 
-    animationFrameId = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   const onMove = (x: number, y: number) => {
@@ -107,14 +86,18 @@ export default function GawaKamayHeadline() {
       }}
       onTouchEnd={() => (cursor.current.inside = false)}
     >
-      {/* Liquid effect layer */}
-      <div className={styles.liquidEffect}></div>
-
-      {/* Existing ::before and ::after elements are handled by CSS module */}
+      {/* ACTUAL SLIME BORDER */}
+      <div className={styles.slime} aria-hidden>
+        <div className={styles.blobs}>
+          <div className={styles.b1} />
+          <div className={styles.b2} />
+          <div className={styles.b3} />
+        </div>
+      </div>
 
       <div className={styles.inner}>
         <div className="text-center my-8">
-          <h1 className="text-5xl font-extrabold text-black dark:text-white leading-tight">
+          <h1 className="text-5xl font-extrabold text-black dark:text-white">
             GawaKamay
           </h1>
           <p className="text-xl text-zinc-800 dark:text-zinc-200 mt-2">
