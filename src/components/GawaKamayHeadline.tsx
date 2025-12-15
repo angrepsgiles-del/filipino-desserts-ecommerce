@@ -9,7 +9,7 @@ export default function GawaKamayHeadline() {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const cursor = useRef({ x: 0.5, y: 0.5, inside: false });
-  const blob = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
+  const liquidTarget = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 }); // Represents the center of the liquid effect
   const last = useRef<number>(0);
 
   useEffect(() => {
@@ -23,46 +23,56 @@ export default function GawaKamayHeadline() {
       last.current = t;
 
       const c = cursor.current;
-      const b = blob.current;
+      const lt = liquidTarget.current;
 
-      // evade cursor
+      // Target point for the liquid, defaults to center
       let tx = 0.5;
       let ty = 0.5;
 
       if (c.inside) {
-        const dx = b.x - c.x;
-        const dy = b.y - c.y;
-        const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 0.0001);
+        // Calculate vector from cursor to liquid target
+        const dx = lt.x - c.x;
+        const dy = lt.y - c.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // higher = more "runs away"
-        const repel = 0.55;
-        tx = clamp(b.x + (dx / dist) * repel, 0.05, 0.95);
-        ty = clamp(b.y + (dy / dist) * repel, 0.10, 0.90);
+        // Repel the liquid target from the cursor
+        // The further the cursor, the stronger the repulsion, up to a limit
+        const repelStrength = 0.8; // How strongly it repels
+        const minRepelDist = 0.1; // Distance below which repulsion becomes very strong
+        const effectiveDist = Math.max(dist, minRepelDist);
+
+        tx = clamp(lt.x + (dx / effectiveDist) * repelStrength, 0.05, 0.95);
+        ty = clamp(lt.y + (dy / effectiveDist) * repelStrength, 0.05, 0.95);
+
+      } else {
+        // Relax to center when cursor leaves
+        tx = 0.5;
+        ty = 0.5;
       }
 
-      // slime physics
-      const k = 9.0;
-      const damp = 0.86;
+      // Spring physics for viscous movement
+      const springK = 8.0; // Spring constant
+      const dampingFactor = 0.7; // Damping to simulate viscosity
 
-      const ax = (tx - b.x) * k;
-      const ay = (ty - b.y) * k;
+      const ax = (tx - lt.x) * springK;
+      const ay = (ty - lt.y) * springK;
 
-      b.vx = b.vx * damp + ax * dt;
-      b.vy = b.vy * damp + ay * dt;
+      lt.vx = (lt.vx + ax * dt) * dampingFactor;
+      lt.vy = (lt.vy + ay * dt) * dampingFactor;
 
-      b.x += b.vx * dt;
-      b.y += b.vy * dt;
+      lt.x += lt.vx * dt;
+      lt.y += lt.vy * dt;
 
-      b.x = clamp(b.x, 0.05, 0.95);
-      b.y = clamp(b.y, 0.10, 0.90);
+      // Clamp liquid position to prevent it from going too far out
+      lt.x = clamp(lt.x, -0.2, 1.2); // Allow some spill, but not excessive
+      lt.y = clamp(lt.y, -0.2, 1.2);
 
-      const v = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+      const v = Math.sqrt(lt.vx * lt.vx + lt.vy * lt.vy); // Velocity magnitude
 
-      // drive YOUR css vars
-      el.style.setProperty("--mx", `${b.x * 100}%`);
-      el.style.setProperty("--my", `${b.y * 100}%`);
-      el.style.setProperty("--v", `${v}`);
-      el.style.setProperty("--t", `${t * 0.001}`);
+      // Set CSS variables (0-100% for mx/my, 0-1 for v)
+      el.style.setProperty("--mx", `${lt.x * 100}%`);
+      el.style.setProperty("--my", `${lt.y * 100}%`);
+      el.style.setProperty("--v", `${clamp(v * 0.5, 0, 1)}`); // Scale velocity for --v range
 
       animationFrameId = requestAnimationFrame(tick);
     };
@@ -97,37 +107,10 @@ export default function GawaKamayHeadline() {
       }}
       onTouchEnd={() => (cursor.current.inside = false)}
     >
-      <svg className={styles.svgDefs}>
-        <filter id="goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-          <feColorMatrix
-            in="blur"
-            mode="matrix"
-            values="
-              1 0 0 0 0
-              0 1 0 0 0
-              0 0 1 0 0
-              0 0 0 22 -9"
-            result="goo"
-          />
-          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-        </filter>
+      {/* Liquid effect layer */}
+      <div className={styles.liquidEffect}></div>
 
-        <filter id="wobble">
-          <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="9">
-            <animate attributeName="baseFrequency" dur="5s" values="0.01;0.015;0.012" repeatCount="indefinite" />
-          </feTurbulence>
-          <feDisplacementMap scale="28" />
-        </filter>
-      </svg>
-
-      <div className={styles.slime}>
-        <div className={styles.blobs}>
-          <div className={styles.b1} />
-          <div className={styles.b2} />
-          <div className={styles.b3} />
-        </div>
-      </div>
+      {/* Existing ::before and ::after elements are handled by CSS module */}
 
       <div className={styles.inner}>
         <div className="text-center my-8">

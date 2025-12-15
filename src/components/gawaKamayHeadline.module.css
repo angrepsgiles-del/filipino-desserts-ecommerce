@@ -3,6 +3,7 @@
   border-radius: 28px;
   padding: 18px;
   border: 3px solid transparent;
+  overflow: hidden; /* Temporarily set to hidden, will be visible for liquid spill */
 
   /* glass base + animated border (no masks) */
   background:
@@ -29,6 +30,53 @@
   0%   { background-position: 0 0, 0% 50%; }
   100% { background-position: 0 0, 220% 50%; }
 }
+
+/* New silver liquid effect */
+.liquidEffect {
+  position: absolute;
+  /* Allow liquid to spill beyond the frame's rounded corners */
+  inset: -30px;
+  border-radius: 28px; /* Inherit or match parent's border-radius for visual consistency */
+  pointer-events: none;
+  z-index: 0; /* Below the text, above the frame::before if it had an explicit z-index */
+  
+  /* Layered gradients for metallic/glassy look */
+  background:
+    /* Top highlight - acts like a light reflection */
+    radial-gradient(
+      circle at calc(var(--mx, 50%) + 15%) calc(var(--my, 50%) + 10%),
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0) 60%
+    ),
+    /* Main liquid body - silver/greyish tone */
+    radial-gradient(
+      ellipse at var(--mx, 50%) var(--my, 50%),
+      rgba(192, 192, 192, 0.7) 0%, /* Silver base */
+      rgba(128, 128, 128, 0.5) 50%, /* Darker silver/grey */
+      rgba(64, 64, 64, 0.3) 100% /* Almost transparent dark */
+    );
+  
+  background-size: 200% 200%; /* Make gradients larger than the inset area */
+  background-position: var(--mx, 50%) var(--my, 50%);
+  transition: background-position 0.1s linear; /* Smooth gradient movement */
+
+  /* Gooey effect using blur */
+  filter: blur(calc(20px + var(--v, 0) * 10px)); /* Blur increases with velocity for more "goo" */
+  
+  /* See-through glassy effect */
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  opacity: calc(0.9 - var(--v, 0) * 0.2); /* Opacity slightly decreases with velocity */
+  transform: scale(calc(1 + var(--v, 0) * 0.05)); /* Slight scale with velocity */
+}
+
+.inner {
+  position: relative;
+  z-index: 1; /* Ensure text is above the liquid */
+}
+
+/* Keep other existing styles like .frame::before and .frame::after if they are part of the animated border and ripples */
+/* These were already part of the animation, so keeping them. */
 
 /* the "unhinged fluid field" that EVADES cursor.
    driven by --mx/--my set by the physics loop */
@@ -109,47 +157,4 @@
   0%   { background-position: 0 0, 0 0, 0% 50%; }
   50%  { background-position: 0 0, 0 0, 120% 50%; }
   100% { background-position: 0 0, 0 0, 0% 50%; }
-}
-
-.inner {
-  position: relative;
-  z-index: 1;
-}
-
-.slime {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 10px; /* Adjust as needed */
-  transform: translate(calc(var(--mx, 0) * 1px), calc(var(--my, 0) * 1px)) scale(var(--v, 1));
-  filter: url(#goo) url(#wobble);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.blobs {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  filter: blur(var(--blur-amount, 30px)); /* Blurs blobs to create the goo effect */
-  border-radius: inherit;
-  overflow: hidden;
-}
-
-.blob {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.4); /* Blob color */
-  border-radius: 50%;
-  width: var(--blob-size, 80px);
-  height: var(--blob-size, 80px);
-  transform: translate(var(--blob-x), var(--blob-y)) scale(var(--blob-scale, 1));
-  animation: blobMovement 10s infinite ease-in-out alternate;
-}
-
-@keyframes blobMovement {
-  0%   { transform: translate(var(--initial-x), var(--initial-y)) scale(var(--initial-scale)); opacity: 0.8; }
-  50%  { transform: translate(var(--mid-x), var(--mid-y)) scale(var(--mid-scale)); opacity: 1; }
-  100% { transform: translate(var(--final-x), var(--final-y)) scale(var(--final-scale)); opacity: 0.8; }
 }
